@@ -1,0 +1,37 @@
+name: CI Calculator Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [ 17, 21 ]
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java-version }}
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Compile all Java sources
+        run: mvn clean compile
+
+      - name: Run all JUnit 5 tests
+        run: mvn test
