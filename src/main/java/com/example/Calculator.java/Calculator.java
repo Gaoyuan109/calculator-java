@@ -3,7 +3,15 @@ package com.example;
 
 
 
+
+
+
+
 public class Calculator {
+
+
+
+
 
 
 
@@ -15,9 +23,17 @@ public class Calculator {
 
 
 
+
+
+
+
     public int subtract(int a, int b) {
-              return a + b;
+              return a - b;
     }
+
+
+
+
 
 
 
@@ -29,13 +45,12 @@ public class Calculator {
 
 
 
+
+
+
+
     public double divide(int a, int b) {
               if (b == 0) {
                             throw new ArithmeticException("Division by zero");
               }
               return (double) a / b;
-    }
-}
-
-
-
