@@ -36,7 +36,8 @@ FROM eclipse-temurin:17-jre
 EXPOSE 8080
 
 # Create a non-root user so the container does not run as root (security).
-RUN useradd -m -u 1000 appuser
+# Note: UID 1000 is already used by the built-in 'default' user, so we use 1001.
+RUN useradd -m -u 1001 appuser
 USER appuser
 
 # WORKDIR for the runtime stage.
