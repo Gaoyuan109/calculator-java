@@ -7,6 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
+  # ---------- Lab 5 job: compile + unit tests (unchanged) ----------
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -35,3 +36,39 @@ jobs:
 
       - name: Run all JUnit 5 tests
         run: mvn test
+
+  # ---------- Lab 6 NEW job: build the Docker image ----------
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ${{ github.repository }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ---- Optional advanced: auto push to Docker Hub on main merge ----
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Docker image to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.DOCKERHUB_USERNAME != ''
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ github.repository }}:latest
