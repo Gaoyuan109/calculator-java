@@ -6,9 +6,9 @@
 
 # ---- Stage 1: build the executable jar ----
 # FROM selects the base image for this stage.
-# maven:3.8-openjdk-17 bundles Maven 3.8 and OpenJDK 17, so we can run
-# `mvn package` without installing a build tool separately.
-FROM maven:3.8-openjdk-17 AS builder
+# maven:3.9-eclipse-temurin-17 bundles Maven 3.9 and Eclipse Temurin JDK 17,
+# so we can run `mvn package` without installing a build tool separately.
+FROM maven:3.9-eclipse-temurin-17 AS builder
 
 # WORKDIR sets the working directory for this stage; it is created if missing.
 WORKDIR /app
@@ -25,12 +25,12 @@ RUN mvn dependency:go-offline
 COPY src ./src
 
 # Package the project: compile, run tests, and produce target/calculator.jar.
-RUN mvn clean package -DskipTests=false
+RUN mvn clean package
 
 # ---- Stage 2: minimal runtime image ----
-# openjdk:17-jre-slim is much smaller than the Maven image because it
+# eclipse-temurin:17-jre is much smaller than the Maven image because it
 # contains only the JRE (no compiler, no Maven).
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre
 
 # Declare the port the container listens on (documentational here).
 EXPOSE 8080
